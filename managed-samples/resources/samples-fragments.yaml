@@ -1,0 +1,15 @@
+---
+apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
+kind: Fragment
+metadata:
+  labels:
+    accelerator.apps.tanzu.vmware.com/category: java-samples
+  name: java-version
+spec:
+  displayName: Select Java Version
+  git:
+    ref:
+      branch: main
+      tag: tap-1.2
+    url: https://github.com/sample-accelerators/fragments.git
+    subPath: java-version
