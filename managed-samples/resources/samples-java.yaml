@@ -25,6 +25,7 @@ spec:
     url: https://github.com/sample-accelerators/hello-fun
     ref:
       branch: main
+      tag: tap-1.2
 ---
 apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
 kind: Accelerator
