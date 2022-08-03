@@ -1,0 +1,42 @@
+---
+apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
+kind: Accelerator
+metadata:
+  labels:
+    accelerator.apps.tanzu.vmware.com/category: sample
+    accelerator.apps.tanzu.vmware.com/language: steeltoe
+  name: weatherforecast-steeltoe
+spec:
+  git:
+    url: https://github.com/sample-accelerators/steeltoe-weatherforecast.git
+    ref:
+      branch: main
+      tag: tap-1.2
+---
+apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
+kind: Accelerator
+metadata:
+  labels:
+    accelerator.apps.tanzu.vmware.com/category: sample
+    accelerator.apps.tanzu.vmware.com/language: csharp
+  name: weatherforecast-csharp
+spec:
+  git:
+    url: https://github.com/sample-accelerators/csharp-weatherforecast.git
+    ref:
+      branch: main
+      tag: tap-1.2
+---
+apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
+kind: Accelerator
+metadata:
+  labels:
+    accelerator.apps.tanzu.vmware.com/category: sample
+    accelerator.apps.tanzu.vmware.com/language: fsharp
+  name: weatherforecast-fsharp
+spec:
+  git:
+    url: https://github.com/sample-accelerators/fsharp-weatherforecast.git
+    ref:
+      branch: main
+      tag: tap-1.2
