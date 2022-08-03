@@ -17,6 +17,8 @@ spec:
 apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
 kind: Fragment
 metadata:
+  labels:
+    accelerator.apps.tanzu.vmware.com/category: platform
   name: live-update
 spec:
   displayName: Live Update
