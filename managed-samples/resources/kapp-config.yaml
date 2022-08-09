@@ -1,0 +1,10 @@
+apiVersion: kapp.k14s.io/v1alpha1
+kind: Config
+rebaseRules:
+- paths: 
+  - [metadata, labels, imports.accelerator.apps.tanzu.vmware.com/live-update]
+  type: copy
+  sources: [existing]
+  resourceMatchers:
+  - apiVersionKindMatcher: {apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1, kind: Accelerator}
+  - apiVersionKindMatcher: {apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1, kind: Fragment}
