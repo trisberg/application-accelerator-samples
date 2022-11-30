@@ -20,7 +20,7 @@ spec:
       name: rmq-where-for-dinner
   source:
     git:
-      url: <https URL for your generated project's Git repository>
+      url: https://github.com/vmware-tanzu/application-accelerator-samples
       ref:
         branch: main
-    subPath: where-for-dinner-notify
+    subPath: where-for-dinner/where-for-dinner-notify
