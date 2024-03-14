@@ -1,0 +1,43 @@
+engine {
+					let backendServiceResourceName = #backendService.toLowerCase() in
+					let workloadResourceName = #artifactId.toLowerCase() in	{
+						applyTo('nginx.conf') {
+							ReplaceText({{text: "http://backend/api/", with: `http://#{#backendServiceResourceName}/api/` }})
+						}
+						applyTo("config/workload.yaml" || "catalog/catalog-info.yaml") {
+							ReplaceText({{text: "angular-frontend", with: #workloadResourceName }})
+						}
+						if (#useSingleSignOn == true) {
+							applyTo("src/assets/auth.conf.json" || "src/app/app.module.ts" || "src/app/app-routing.module.ts") {
+								ReplaceText( {
+									{text: "<your-authserver-uri>", with: #authority},
+									{text: "<your-client-id>", with: #workloadResourceName},
+									{text: "<your-authserver-match-label-value>", with: #authorityLabelValue},
+									{text: "<your-authserver-match-label-key>", with: #authorityLabelKey},
+									{text: "<your-namespace>", with: #namespace}
+								})
+							}
+						} else {
+							Exclude({"README.md", "src/app/app.module.ts", "src/app/app-routing.module.ts", "AUTHORIZATION.md", "src/app/authorization/**", "src/app/user-profile/**", "src/assets/auth.conf.json", "src/app/app-config.service.ts", "src/utils.ts", "src/utils.spec.ts"})
+							+ Include({"src/app/app.module.ts", "src/app/app-routing.module.ts"})
+								.ReplaceText(regex: {pattern: "// StartSSOImports[\\s\\S]+?// EndSSOImports", with: ''})
+								.ReplaceText(regex: {pattern: "// StartSSOProviders[\\s\\S]+?// EndSSOProviders", with: ''})
+								.ReplaceText(regex: {pattern: "// StartSSOModules[\\s\\S]+?// EndSSOModules", with: ''})
+								.ReplaceText(regex: {pattern: "// StartSSORoutes[\\s\\S]+?// EndSSORoutes", with: ''})
+							+ Include({'README.md'})
+								.ReplaceText(regex: {pattern: "--- StartAuthorization[\\s\\S]+?--- EndAuthorization", with: ''})
+							UniquePath()
+						}
+
+						{
+							Include({'**'})
+							+ InvokeFragment('tap-workload')
+						}
+						UniquePath()
+
+
+						Exclude({'tekton/**'})
+						Provenance()
+					}
+				}
+
