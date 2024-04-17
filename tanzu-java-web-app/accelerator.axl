@@ -1,0 +1,63 @@
+engine {
+
+  // Include files for the selected build tool
+  if (#buildTool == "maven") {
+    Exclude({"*gradle*", "Tiltfile_gradle_vscode", "Tiltfile_gradle_intellij"})
+    +InvokeFragment(reference: "build-wrapper-maven")
+  }
+  if (#buildTool == "gradle") {
+    Exclude({"pom.xml"})
+    applyTo("settings.gradle") {
+      ReplaceText({{text: "tanzu-java-web-app", with: #projectName}})  
+    }
+    if (#ide == "vscode") {
+      Exclude({"Tiltfile", "Tiltfile_gradle_intellij"})
+      RewritePath(regex: "Tiltfile_gradle_vscode", rewriteTo: "Tiltfile")
+    }
+    if (#ide == "intellij") {
+      Exclude({"Tiltfile", "Tiltfile_gradle_vscode"})
+      RewritePath(regex: "Tiltfile_gradle_intellij", rewriteTo: "Tiltfile")
+    }
+    +InvokeFragment(reference: "build-wrapper-gradle")
+  }
+
+  // Update the artifact name as needed
+  applyTo("Tiltfile") {
+    ReplaceText({{text: "tanzu-java-web-app", with: #artifactId.toLowerCase()}})
+  }
+  applyTo("catalog/*.yaml") {
+    ReplaceText({{text: "tanzu-java-web-app", with: #artifactId}})
+  }
+  applyTo("config/workload.yaml") {
+    ReplaceText({{text: "tanzu-java-web-app", with: #artifactId.toLowerCase()}})
+  }
+  applyTo("README.md") {
+    ReplaceText({{text: "tanzu-java-web-app", with: #artifactId.toLowerCase()}})
+  }
+
+  // Update files if native build is selected
+  if (#nativeBuild) {
+    applyTo("config/workload-native.yaml") {
+      ReplaceText({{text: "tanzu-java-web-app", with: #artifactId.toLowerCase()}})
+    }
+    applyTo("README-native.md") {
+      ReplaceText({{text: "tanzu-java-web-app", with: #artifactId.toLowerCase()}})
+    }
+    RewritePath(regex: "README-native.md", rewriteTo: "README.md")
+    UniquePath(strategy: Append)
+  }
+  else {
+    Exclude({"config/workload-native.yaml", "README-native.md"})
+  }
+
+  // Update the java version
+  +InvokeFragment(reference: "java-version")
+  UniquePath(strategy: UseLast)
+
+  // Include devcontainer files if selected
+  +InvokeFragment(reference: "devcontainer")
+
+  // Create the provenance file
+  Provenance()
+
+}
