@@ -10,13 +10,15 @@ engine {
     applyTo("settings.gradle") {
       ReplaceText({{text: "tanzu-java-web-app", with: #projectName}})  
     }
-    if (#ide == "vscode") {
-      Exclude({"Tiltfile", "Tiltfile_gradle_intellij"})
-      RewritePath(regex: "Tiltfile_gradle_vscode", rewriteTo: "Tiltfile")
-    }
-    if (#ide == "intellij") {
-      Exclude({"Tiltfile", "Tiltfile_gradle_vscode"})
-      RewritePath(regex: "Tiltfile_gradle_intellij", rewriteTo: "Tiltfile")
+    {
+      if (#ide == "intellij") {
+        Exclude({"Tiltfile", "Tiltfile_gradle_vscode"})
+        RewritePath(regex: "Tiltfile_gradle_intellij", rewriteTo: "Tiltfile")
+      }
+      if (#ide == "vscode") {
+        Exclude({"Tiltfile", "Tiltfile_gradle_intellij"})
+        RewritePath(regex: "Tiltfile_gradle_vscode", rewriteTo: "Tiltfile")
+      }
     }
     +InvokeFragment(reference: "build-wrapper-gradle")
   }
