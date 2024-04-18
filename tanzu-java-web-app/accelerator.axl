@@ -6,20 +6,21 @@ engine {
     +InvokeFragment(reference: "build-wrapper-maven")
   }
   if (#buildTool == "gradle") {
-    Exclude({"pom.xml"})
     applyTo("settings.gradle") {
       ReplaceText({{text: "tanzu-java-web-app", with: #projectName}})  
     }
     if (#ide == "intellij") {
       Exclude({"Tiltfile", "Tiltfile_gradle_vscode"})
       RewritePath(regex: "Tiltfile_gradle_intellij", rewriteTo: "Tiltfile")
-    } else {
-      if (#ide == "vscode") {
-        Exclude({"Tiltfile", "Tiltfile_gradle_intellij"})
-        RewritePath(regex: "Tiltfile_gradle_vscode", rewriteTo: "Tiltfile")
-      }
     }
-    +InvokeFragment(reference: "build-wrapper-gradle")
+    if (#ide == "vscode") {
+      Exclude({"Tiltfile", "Tiltfile_gradle_intellij"})
+      RewritePath(regex: "Tiltfile_gradle_vscode", rewriteTo: "Tiltfile")
+    }
+    {
+      Exclude({"pom.xml"})
+      +InvokeFragment(reference: "build-wrapper-gradle")
+    }
   }
 
   // Update the artifact name as needed
