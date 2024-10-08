@@ -1,0 +1,29 @@
+accelerator:
+  options:
+  - name: deploymentType
+    inputType: select
+    label: Deployment type
+    choices:
+    - value: kubernetes
+      text: Kubernetes deployment and service
+    - value: cloudfoundry
+      text: Cloudfoundry manifest
+    - value: tpfork8s
+      text: Tanzu Platform for Kubernetes ContainerApp
+    - value: none
+      text: Skip deployment artifacts
+    defaultValue: none
+  - name: persistenceType
+    inputType: select
+    label: Persistence type
+    choices:
+    - value: jpa
+      text: Relational database using JPA
+    - value: redis
+      text: Redis key value strore
+    - value: mongodb
+      text: MongoDB document database
+    defaultValue: jpa
+  imports:
+  - name: java-version
+  - name: build-wrapper-gradle

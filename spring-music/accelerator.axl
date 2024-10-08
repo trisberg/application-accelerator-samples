@@ -1,0 +1,83 @@
+engine {
+
+  applyTo("build.gradle" || "README.md" || "**/*.yaml" || "**/*.java") {
+    TextPreprocessor()
+  }
+
+  if (#deploymentType == 'none') {
+    Exclude({"deploy/**"})
+  } else {
+    if (#deploymentType == 'cloudfoundry') {
+      Exclude({"deploy/tpfork8s/**", "deploy/kubernetes/**"})
+      applyTo("deploy/cloudfoundry/manifest.yml") {
+        ReplaceText({{text: "spring-music", with: #artifactId.toLowerCase()}})
+        RewritePath(rewriteTo: 'cloudfoundry/' + #filename)
+      }
+      applyTo("deploy/cloudfoundry/project.toml") {
+        ReplaceText({{text: "spring-music", with: #artifactId.toLowerCase()}})
+        RewritePath(rewriteTo: #filename)
+      }
+    }
+    if (#deploymentType == 'kubernetes') {
+      Exclude({"deploy/tpfork8s/**", "deploy/cloudfoundry/**"})
+      applyTo("deploy/kubernetes/*.yaml") {
+        ReplaceText({{text: "spring-music", with: #artifactId.toLowerCase()}})
+        RewritePath(rewriteTo: 'kubernetes/' + #filename)
+      }
+    }
+    if (#deploymentType == 'tpfork8s') {
+      Exclude({"deploy/kubernetes/**", "deploy/cloudfoundry/**"})
+      applyTo("deploy/tpfork8s/tanzu.yml") {
+        ReplaceText({{text: "spring-music", with: #artifactId.toLowerCase()}})
+        RewritePath(rewriteTo: #filename)
+      }
+      applyTo("deploy/tpfork8s/.tanzu/config/spring-music.yml") {
+        ReplaceText({{text: "spring-music", with: #artifactId.toLowerCase()}})
+        RewritePath(rewriteTo: '.tanzu/config/' + #artifactId.toLowerCase() + '.yml')
+      }
+    }
+    UniquePath(strategy: UseLast)
+  }
+
+  if (#persistenceType == 'jpa') {
+    Exclude({
+        "src/main/java/com/example/music/config/data/**",
+        "src/main/java/com/example/music/repositories/mongodb/**",
+        "src/main/java/com/example/music/repositories/redis/**"})
+  }
+  if (#persistenceType == 'mongodb') {
+    Exclude({
+        "src/main/java/com/example/music/config/data/**",
+        "src/main/java/com/example/music/domain/RandomIdGenerator.java",
+        "src/main/java/com/example/music/repositories/jpa/**",
+        "src/main/java/com/example/music/repositories/redis/**"})
+  }
+  if (#persistenceType == 'redis') {
+    Exclude({
+        "src/main/java/com/example/music/repositories/mongodb/**",
+        "src/main/java/com/example/music/repositories/jpa/**"})
+  }
+
+  // Update the artifact name as needed
+  applyTo("README.md" || "settings.gradle") {
+    ReplaceText({{text: "spring-music", with: #artifactId.toLowerCase()}})
+  }
+
+  {
+    Include({"**"})
+    // Update the java version
+    + InvokeFragment("java-version")
+  }
+  UniquePath(strategy: UseLast)
+
+  {
+    Include({"**"})
+    // Add the build wrapper
+    + InvokeFragment("build-wrapper-gradle")
+  }
+  UniquePath(strategy: UseLast)
+
+  // Create the provenance file
+  Provenance()
+
+}
